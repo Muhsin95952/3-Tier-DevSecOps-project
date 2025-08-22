@@ -34,9 +34,6 @@ jobs:
     steps:
       - name: GitLeaks code
         uses: actions/checkout@v4
-      
-      - name: GitLeaks setup
-        uses: gitleaks/gitleaks-action@v2
 
       - name: Install Gitleaks
         run: |
