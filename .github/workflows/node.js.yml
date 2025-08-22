@@ -40,10 +40,9 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         
       - name: GitLeaks scan client
-        run: gitleaks detect --cource ./client --exit-code 1
-          
-      - name: GitLeaks scan api
-        run: gitleaks detect --cource ./api --exit-code 1
+        run: |
+          gitleaks detect --cource ./client --exit-code 1
+          gitleaks detect --cource ./api --exit-code 1
           
       
       
