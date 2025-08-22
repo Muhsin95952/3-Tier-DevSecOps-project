@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: checkout code
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
     - name: setup nodejs
       uses: actions/setup-node@v4
       with:
@@ -26,3 +26,20 @@ jobs:
       run: |
         cd client
         find . -name "*.js" -exec node --check {} +
+        
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    needs: compile
+    steps:
+      - name: GitLeaks code
+        uses: actions/checkout@v4
+      
+      - name: GitLeaks setup
+        uses: gitleaks/gitleaks-action@v2
+        
+      - name: GitLeaks scan
+        run: |
+          gitleaks detect --cource ./client --exec-code-1
+          gitleaks detect --cource ./api --exec-code-1
+      
