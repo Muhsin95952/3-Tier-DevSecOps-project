@@ -14,17 +14,18 @@ jobs:
     steps:
     - name: checkout code
       uses: actions/checkout@v4
+      
     - name: setup nodejs
       uses: actions/setup-node@v4
       with:
-        node-version: '23'
+        node-version: '22'
     - name: Frontend Compilation
       run: | 
         cd client
         find . -name "*.js" -exec node --check {} +
     - name: Backend Compilation
       run: |
-        cd client
+        cd api
         find . -name "*.js" -exec node --check {} +
         
   scan:
@@ -38,8 +39,11 @@ jobs:
       - name: GitLeaks setup
         uses: gitleaks/gitleaks-action@v2
         
-      - name: GitLeaks scan
-        run: |
-          gitleaks detect --cource ./client --exec-code-1
-          gitleaks detect --cource ./api --exec-code-1
+      - name: GitLeaks scan client
+        run: gitleaks detect --cource ./client --exec-code-1
+          
+      - name: GitLeaks scan api
+        run: gitleaks detect --cource ./api --exec-code-1
+          
+      
       
