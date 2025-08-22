@@ -15,9 +15,6 @@ RUN npm run build
 # Stage 2: Serve with NGINX
 FROM nginx:alpine
 
-# 🟢 Copy correct default.conf to override nginx default
-COPY default.conf /etc/nginx/conf.d/default.conf
-
 # 🟢 Copy React build output
 COPY --from=build /app/build /usr/share/nginx/html
 
