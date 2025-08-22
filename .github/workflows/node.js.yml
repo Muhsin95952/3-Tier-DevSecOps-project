@@ -37,6 +37,11 @@ jobs:
       
       - name: GitLeaks setup
         uses: gitleaks/gitleaks-action@v2
+
+      - name: Install Gitleaks
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64.tar.gz \
+          | tar -xz -C /usr/local/bin gitleaks
         
       - name: GitLeaks scan
         run: |
