@@ -154,4 +154,31 @@ jobs:
           tags: muhsin95952/frontend:latest
           file: ./client/Dockerfile
 
+  Trivy-image-scan:
+    runs-on: ubuntu-24.04
+    needs: build_frontend_docker_image_and_push
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner for backend
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: image
+          image-ref: muhsin95952/backend:latest
+          format: 'table'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'HIGH,CRITICAL'
+          
+      - name: Run Trivy vulnerability scanner for frontend
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: image
+          image-ref: muhsin95952/frontend:latest
+          format: 'table'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'HIGH,CRITICAL'
+
       
