@@ -181,4 +181,56 @@ jobs:
           vuln-type: 'os,library'
           severity: 'HIGH,CRITICAL'
 
-      
+  deploy_clone:
+    runs-on: ubuntu-latest
+    needs: build_backend_docker_image_and_push
+    steps:
+    - name: SSH into EC2 and clone repo
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd /home/ubuntu
+          if [ ! -d "3-Tier-DevSecOps-project" ]; then
+            git clone https://github.com/Muhsin95952/3-Tier-DevSecOps-project.git
+          else
+            cd 3-Tier-DevSecOps-project
+            git pull origin main
+          fi
+
+
+  deploy_backend:
+    runs-on: ubuntu-latest
+    needs: [deploy_clone]
+    steps:
+      - name: Start Backend on EC2
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/3-Tier-DevSecOps-project/api
+            npm install
+            pkill -f "node" || true
+            nohup npm start > backend.log 2>&1 &
+
+
+  deploy_frontend:
+    runs-on: ubuntu-latest
+    needs: [deploy_backend]
+    steps:
+      - name: Start Frontend on EC2
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/3-Tier-DevSecOps-project/client
+            npm install
+            npm run build
+            npx serve -s build -l 3000 > frontend.log 2>&1 &
+  
