@@ -245,9 +245,12 @@ jobs:
             fi
             npm install
             npm run build
-            pkill -f "serve" || true
-            sudo npm install -g pm2
-            sudo npm install -g serve
+            if ! command -v pm2 &> /dev/null; then
+              sudo npm install -g pm2 serve
+            fi
+            if pm2 list | grep -q "frontend"; then
+              pm2 delete frontend
+            fi
             pm2 start "serve -s build -l 3000" --name "frontend"
             pm2 save
 
