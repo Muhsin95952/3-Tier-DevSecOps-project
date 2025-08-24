@@ -203,19 +203,24 @@ jobs:
 
   deploy_backend:
     runs-on: ubuntu-latest
-    needs: [deploy_clone]
+    needs: deploy_clone
     steps:
-      - name: Start Backend on EC2
-        uses: appleboy/ssh-action@v0.1.8
-        with:
+     - name: Start Backend on EC2
+       uses: appleboy/ssh-action@v0.1.8
+       with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/3-Tier-DevSecOps-project/api
-            npm install
-            pkill -f "node" || true
-            nohup npm start > backend.log 2>&1 &
+              if ! command -v npm &> /dev/null
+              then
+                curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+                sudo apt-get install -y nodejs
+              fi
+              cd /home/ubuntu/3-Tier-DevSecOps-project/api
+              npm install
+              pkill -f "node" || true
+              nohup npm start > backend.log 2>&1 &
 
 
   deploy_frontend:
