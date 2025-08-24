@@ -220,7 +220,9 @@ jobs:
               cd /home/ubuntu/3-Tier-DevSecOps-project/api
               npm install
               pkill -f "node" || true
-              nohup npm start > backend.log 2>&1 &
+              sudo npm install -g pm2
+              pm2 start npm --name "backend" -- start
+              pm2 save
 
 
   deploy_frontend:
@@ -235,7 +237,15 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ubuntu/3-Tier-DevSecOps-project/client
+            if ! command -v npm &> /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
             npm install
             npm run build
-            npx serve -s build -l 3000 > frontend.log 2>&1 &
-  
+            pkill -f "serve" || true
+            sudo npm install -g pm2
+            sudo npm install -g serve
+            pm2 start "serve -s build -l 3000" --name "frontend"
+            pm2 save
+
