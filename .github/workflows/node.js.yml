@@ -188,6 +188,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+  
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -195,10 +196,18 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/app
+            # ensure docker & docker-compose installed
+            if ! command -v docker-compose &> /dev/null; then
+              sudo apt-get update -y
+              sudo apt-get install -y docker-compose
+            fi
+  
+            # pull images
             docker pull muhsin95952/frontend:latest
             docker pull muhsin95952/backend:latest
             docker pull mysql:8.0
-            docker compose down
-            docker compose up -d
-       
+
+            # restart containers
+            docker-compose down
+            docker-compose up -d
+         
